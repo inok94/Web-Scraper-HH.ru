@@ -1,0 +1,47 @@
+### Nginx Server Container ##################################
+
+nginx:
+    image: nginx:latest
+    volumes_from:
+        - application
+    expose:
+        - "80"
+    links:
+        - php-fpm
+    labels:
+        - "traefik.frontend.rule=Host:${HOST}"
+        - "traefik.port=80"
+    env_file: .env
+
+### PHP-FPM Container #######################################
+
+php-fpm:
+    image: workspace/php5.6:latest
+    volumes_from:
+        - application
+    expose:
+        - "9000"
+    labels:
+        - "traefik.enable=false"
+    dns:
+        - 172.17.0.1
+        - 10.0.0.10
+
+### Laravel Application Code Container ######################
+
+application:
+    image: app:latest
+    volumes:
+        - .:/var/www
+
+### Add more Containers below ###############################
+
+### MySQL Container #########################################
+
+mysql:
+        image: mysql
+        volumes:
+            - mysql:/var/lib/mysql
+        ports:
+            - "3306:3306"
+
